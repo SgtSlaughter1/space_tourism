@@ -64,7 +64,7 @@ export default {
 
 <style scoped>
 #technology {
-    background-image: url("/src/assets/images/technology/background-technology-desktop.jpg");
+    background-image: url("/images/technology/background-technology-desktop.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -110,14 +110,14 @@ export default {
 /* Responsive styles */
 @media (max-width: 768px) {
     #technology {
-        background-image: url("/src/assets/images/technology/background-technology-tablet.jpg");
+        background-image: url("/images/technology/background-technology-tablet.jpg");
         height: 100%;
     }
 }
 
 @media (max-width: 480px) {
     #technology {
-        background-image: url("/src/assets/images/technology/background-technology-mobile.jpg");
+        background-image: url("/images/technology/background-technology-mobile.jpg");
         height: 100%;
         padding: 0 5px;
     }
