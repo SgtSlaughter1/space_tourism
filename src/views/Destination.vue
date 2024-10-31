@@ -2,38 +2,43 @@
     <div class="destination container-fluid">
         <div class="row">
             <div class="col-12">
-                <h2 class="text-white"> <span class="mx-4 text-secondary">01</span> PICK YOUR DESTINATION</h2>
+                <h2 class="text-white">
+                    <span class="mx-4 text-secondary">01</span> PICK YOUR DESTINATION
+                </h2>
 
-                <div v-if="activeDestination" class="card h-100 d-flex flex-column flex-lg-row">
-                    <div class="col-lg-6 p-0">
-                        <img :src="activeDestination.images.png" class="img-fluid" :alt="activeDestination.name">
-                    </div>
-                    <div class="card-body col-lg-6 d-flex flex-column">
-                        <div class="location-buttons d-flex justify-content-center ">
-                            <button v-for="(destination, index) in destinations" :key="destination.id"
-                                @click="updateSelectedDestination(index)"
-                                :class="{ active: selectedDestinationIndex === index }"
-                                class="btn mx-2">
-                                {{ destination.name }}
-                            </button>
+                <transition name="fade">
+                    <div v-if="activeDestination" class="card h-100 d-flex flex-column flex-lg-row">
+                        <div class="col-lg-6 p-0">
+                            <img :src="activeDestination.images.png" class="img-fluid" :alt="activeDestination.name">
                         </div>
-                        <h5 class="card-title my-3">{{ activeDestination.name }}</h5>
-                        <p class="card-text">{{ activeDestination.description }}</p>
-                        <hr>
-                        <div class="d-flex total">
-                            <p class="distance">Avg. Distance: <span>{{ activeDestination.distance }}</span></p>
-                            <p class="time">Travel Time: <span>{{ activeDestination.travel }}</span></p>
+                        <div class="card-body col-lg-6 d-flex flex-column">
+                            <div class="location-buttons d-flex justify-content-center">
+                                <button
+                                    v-for="(destination, index) in destinations"
+                                    :key="destination.id"
+                                    @click="updateSelectedDestination(index)"
+                                    :class="{ active: selectedDestinationIndex === index }"
+                                    class="btn mx-2"
+                                >
+                                    {{ destination.name }}
+                                </button>
+                            </div>
+                            <h5 class="card-title my-3">{{ activeDestination.name }}</h5>
+                            <p class="card-text">{{ activeDestination.description }}</p>
+                            <hr>
+                            <div class="d-flex total">
+                                <p class="distance">Avg. Distance: <span>{{ activeDestination.distance }}</span></p>
+                                <p class="time">Travel Time: <span>{{ activeDestination.travel }}</span></p>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </transition>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
     name: "Destination",
     data() {
@@ -50,8 +55,10 @@ export default {
     methods: {
         async fetchDestinations() {
             try {
-                const response = await axios.get('http://localhost:3000/destinations');
-                this.destinations = response.data;
+                const response = await fetch('/data.json');
+                if (!response.ok) throw new Error("Network response was not ok");
+                const data = await response.json();
+                this.destinations = data.destinations;
             } catch (error) {
                 console.error("Error fetching destinations:", error);
             }
@@ -85,7 +92,6 @@ export default {
 .card-body {
     color: white;
     padding: 10px;
-
 }
 
 .card-title {
@@ -122,6 +128,13 @@ export default {
     border-bottom: 3px solid white;
 }
 
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to {
+    opacity: 0;
+}
+
 @media screen and (max-width: 600px) {
     .destination {
         height: 870px;
@@ -155,11 +168,9 @@ export default {
     .card-text {
         font-size: 15px;
     }
-
 }
 
 @media screen and (min-width: 601px ) and (max-width: 1020px) {
-
     .row > div > h2 {
         font-size: 25px;
         margin-top: 10px;

@@ -1,57 +1,64 @@
 <template>
     <div id="technology" class="container-fluid">
-        <h1 class="text-uppercase mb-5">03 Space launch 101</h1>
+        <h1 class="text-uppercase mb-5">03 Space Launch 101</h1>
         <div class="row">
             <div class="col-lg-6 order-lg-2 order-sm-1 mb-4 mb-lg-0">
-                <img :src="currentTechnology.images.portrait" :alt="currentTechnology.name" class="img-fluid" />
+                <transition name="fade">
+                    <img v-if="currentTechnology" :src="currentTechnology.images.portrait" :alt="currentTechnology.name" class="img-fluid" />
+                </transition>
             </div>
             <div class="col-lg-6 order-lg-1 order-sm-2 d-flex justify-content-center mt-5 floss">
                 <div class="my-5 btnDiv mx-5">
-                    <button v-for="(tech, index) in technology" :key="tech.name" @click="setTechnology(tech)"
+                    <button v-for="(tech, index) in technology" :key="tech.id" @click="setTechnology(index)"
                         class="btn btn-outline-light rounded-circle me-3"
-                        :class="{ active: tech.name === currentTechnology.name }">
+                        :class="{ active: selectedTechnologyIndex === index }">
                         {{ index + 1 }}
                     </button>
                 </div>
-                <div class="content">
-                    <h3 class="text-uppercase mb-2">The terminology...</h3>
-                    <h2 class="display-4 text-white mb-4">
-                        {{ currentTechnology.name }}
-                    </h2>
-                    <p>{{ currentTechnology.description }}</p>
-                </div>
+                <transition name="fade">
+                    <div v-if="currentTechnology" class="content">
+                        <h3 class="text-uppercase mb-2">The terminology...</h3>
+                        <h2 class="display-4 text-white mb-4">{{ currentTechnology.name }}</h2>
+                        <p>{{ currentTechnology.description }}</p>
+                    </div>
+                </transition>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import axios from "axios";
-
 export default {
     name: "Technology",
     data() {
         return {
             technology: [],
-            currentTechnology: {},
+            selectedTechnologyIndex: 0,
         };
     },
-    created() {
-        axios
-            .get("http://localhost:3000/technology")
-            .then((response) => {
-                this.technology = response.data;
-                this.currentTechnology = this.technology[0];
-            })
-            .catch((error) => {
-                console.error("Error fetching data:", error);
-            });
+    computed: {
+        currentTechnology() {
+            return this.technology[this.selectedTechnologyIndex];
+        }
     },
     methods: {
-        setTechnology(tech) {
-            this.currentTechnology = tech;
+        async fetchTechnology() {
+            try {
+                const response = await fetch('/data.json');
+                if (!response.ok) throw new Error("Network response was not ok");
+                const data = await response.json();
+                this.technology = data.technology;
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
         },
+        setTechnology(index) {
+            this.selectedTechnologyIndex = index;
+        }
     },
+    async mounted() {
+        await this.fetchTechnology();
+    }
 };
 </script>
 
@@ -88,6 +95,19 @@ export default {
     width: 70px;
 }
 
+.active {
+    background-color: white;
+    color: black;
+}
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to {
+    opacity: 0;
+}
+
+/* Responsive styles */
 @media (max-width: 768px) {
     #technology {
         background-image: url("/src/assets/images/technology/background-technology-tablet.jpg");
@@ -107,28 +127,22 @@ export default {
     }
 
     .btnDiv {
-        display: flex;
         flex-direction: row;
-        justify-content: center;
-    }
-
-    .btn {
-        margin-top: -100px;
-    }
-
-    .floss {
-        flex-direction: column;
-        /* border: 1px solid red; */
-    }
-
-    .content {
-        margin-top: -70px;
         justify-content: center;
     }
 
     .btn {
         height: 50px;
         width: 50px;
+    }
+
+    .floss {
+        flex-direction: column;
+    }
+
+    .content {
+        margin-top: -70px;
+        justify-content: center;
     }
 }
 </style>
