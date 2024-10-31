@@ -49,7 +49,7 @@ export default {
     methods: {
         async fetchCrew() {
             try {
-                const response = await fetch('/public/data.json');
+                const response = await fetch('/data.json');
                 if (!response.ok) throw new Error("Network response was not ok");
                 console.log(response)
                 const data = await response.json();
